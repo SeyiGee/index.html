@@ -1,191 +1,320 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA - Autonomous Universal Risk Agent (Crypto Futures)</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darker: '#030712',
-                        cardbg: '#0b0f19',
-                        bordercolor: '#1f2937',
-                    }
-                }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AetherTrade AI — Crypto Futures Agent</title>
+  <meta name="description" content="AI-powered crypto futures trading agent with chart analysis, risk management, entry/SL/TP automation and research tools." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            aether: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49',
+            },
+            dark: {
+              850: '#0f1419',
+              900: '#0a0e13',
+              950: '#05070a',
             }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
         }
-    </script>
-    <!-- FontAwesome & Google Fonts -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #030712; }
-        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #374151; }
-    </style>
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { background: #05070a; }
+    .glass {
+      background: rgba(15, 20, 25, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.12);
+    }
+    .glow { box-shadow: 0 0 20px rgba(14, 165, 233, 0.15); }
+    .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    .tv-chart { min-height: 380px; }
+    @media (max-width: 640px) {
+      .tv-chart { min-height: 320px; }
+    }
+    .pulse-dot {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-<body class="bg-darker text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black">
-
-    <!-- TOP NAVIGATION BAR -->
-    <header class="border-b border-bordercolor bg-cardbg/80 backdrop-blur sticky top-0 z-50 px-4 py-3 flex flex-wrap justify-between items-center gap-4">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                <i class="fa-solid fa-robot text-black text-lg font-bold"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-lg tracking-wide flex items-center gap-2">
-                    AURA <span class="text-xs px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">v2.4-PRO</span>
-                </h1>
-                <p class="text-xs text-slate-400">Autonomous Futures Trading & Intelligence Agent</p>
-            </div>
+<body class="font-sans text-slate-200 antialiased min-h-screen">
+  <!-- Top Nav -->
+  <header class="sticky top-0 z-50 glass border-b border-sky-900/40">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-sky-500/30">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
         </div>
-
-        <!-- Global Stats & Agent Toggle -->
-        <div class="flex items-center gap-4 flex-wrap">
-            <div class="bg-slate-900 border border-bordercolor px-3 py-1.5 rounded-lg flex items-center gap-3">
-                <div class="text-right">
-                    <p class="text-[10px] text-slate-400 uppercase">Portfolio Balance</p>
-                    <p class="font-mono text-sm font-bold text-emerald-400">$124,582.40</p>
-                </div>
-                <div class="h-6 w-px bg-bordercolor"></div>
-                <div class="text-right">
-                    <p class="text-[10px] text-slate-400 uppercase">24h PnL</p>
-                    <p class="font-mono text-sm font-bold text-emerald-400">+$4,210.80 (+3.49%)</p>
-                </div>
-            </div>
-
-            <!-- Master Toggle Button -->
-            <button id="agentToggleBtn" onclick="toggleAgent()" class="flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm transition-all shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20">
-                <span id="agentStatusDot" class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
-                <span id="agentStatusText">Agent Active</span>
-            </button>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white">AetherTrade <span class="text-sky-400">AI</span></h1>
+          <p class="text-[10px] sm:text-xs text-slate-500 -mt-0.5">Futures Agent · Risk First</p>
         </div>
-    </header>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span>
+          Paper Mode
+        </div>
+        <button id="btnTheme" class="p-2 rounded-lg hover:bg-slate-800/80 transition" title="Settings">
+          <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <!-- MAIN DASHBOARD CONTENT -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 space-y-4 pb-24 sm:pb-8">
+    <!-- Disclaimer -->
+    <div class="rounded-xl bg-amber-500/10 border border-amber-500/25 px-3 py-2.5 text-[11px] sm:text-xs text-amber-200/90 leading-relaxed">
+      <strong class="text-amber-300">Educational demo only.</strong> Not financial advice. No real orders are placed. Past performance ≠ future results. Crypto futures are high risk. Always do your own research.
+    </div>
 
-        <!-- COLUMN 1 & 2: Charts, Intelligence Feeds & Active Trades -->
-        <div class="lg:col-span-2 space-y-6">
+    <!-- Pair + Status Bar -->
+    <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+      <div class="flex-1 glass rounded-xl p-3 flex flex-wrap items-center gap-2">
+        <label class="text-xs text-slate-500 font-medium uppercase tracking-wider">Pair</label>
+        <select id="pairSelect" class="flex-1 min-w-[140px] bg-slate-900/80 border border-slate-700 rounded-lg px-3 py-2 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-sky-500/50">
+          <option value="BINANCE:BTCUSDT">BTC / USDT</option>
+          <option value="BINANCE:ETHUSDT">ETH / USDT</option>
+          <option value="BINANCE:SOLUSDT">SOL / USDT</option>
+          <option value="BINANCE:BNBUSDT">BNB / USDT</option>
+          <option value="BINANCE:XRPUSDT">XRP / USDT</option>
+          <option value="BINANCE:DOGEUSDT">DOGE / USDT</option>
+          <option value="BINANCE:AVAXUSDT">AVAX / USDT</option>
+          <option value="BINANCE:LINKUSDT">LINK / USDT</option>
+        </select>
+        <div id="priceDisplay" class="font-mono text-lg sm:text-xl font-semibold text-white tabular-nums">—</div>
+        <div id="priceChange" class="text-xs font-medium px-2 py-0.5 rounded-md">—</div>
+      </div>
+      <div class="glass rounded-xl p-3 flex items-center gap-4 text-sm">
+        <div>
+          <div class="text-[10px] text-slate-500 uppercase">Account</div>
+          <div id="accountBalance" class="font-mono font-semibold text-emerald-400">$10,000</div>
+        </div>
+        <div class="w-px h-8 bg-slate-700"></div>
+        <div>
+          <div class="text-[10px] text-slate-500 uppercase">Risk / Trade</div>
+          <div id="riskPerTrade" class="font-mono font-semibold text-sky-400">1.0%</div>
+        </div>
+      </div>
+    </div>
 
-            <!-- MARKET SCANNER & PAIR SELECTOR -->
-            <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 shadow-xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="font-semibold text-sm flex items-center gap-2 text-slate-200">
-                        <i class="fa-solid fa-radar text-cyan-400"></i> Multi-Pair AI Analysis & Scanner
-                    </h2>
-                    <span class="text-xs font-mono text-slate-400">Scanning 24/7 Futures Pairs</span>
-                </div>
-                
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <!-- Pair Card 1 -->
-                    <div onclick="selectPair('BTC/USDT')" id="card-BTC" class="pair-card cursor-pointer p-3 rounded-xl border border-cyan-500 bg-cyan-500/5 transition-all">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-bold text-sm">BTC/USDT</span>
-                            <span class="text-xs font-mono text-emerald-400">+2.4%</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mono">AI: Strong Bullish</p>
-                        <div class="mt-2 text-[10px] bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded inline-block">Score: 88/100</div>
-                    </div>
-                    <!-- Pair Card 2 -->
-                    <div onclick="selectPair('ETH/USDT')" id="card-ETH" class="pair-card cursor-pointer p-3 rounded-xl border border-bordercolor bg-slate-900/50 hover:border-slate-700 transition-all">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-bold text-sm">ETH/USDT</span>
-                            <span class="text-xs font-mono text-emerald-400">+1.8%</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mono">AI: Bullish</p>
-                        <div class="mt-2 text-[10px] bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded inline-block">Score: 76/100</div>
-                    </div>
-                    <!-- Pair Card 3 -->
-                    <div onclick="selectPair('SOL/USDT')" id="card-SOL" class="pair-card cursor-pointer p-3 rounded-xl border border-bordercolor bg-slate-900/50 hover:border-slate-700 transition-all">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-bold text-sm">SOL/USDT</span>
-                            <span class="text-xs font-mono text-rose-400">-1.2%</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mono">AI: Consolidation</p>
-                        <div class="mt-2 text-[10px] bg-yellow-500/10 text-yellow-300 px-2 py-0.5 rounded inline-block">Score: 54/100</div>
-                    </div>
-                    <!-- Pair Card 4 -->
-                    <div onclick="selectPair('XRP/USDT')" id="card-XRP" class="pair-card cursor-pointer p-3 rounded-xl border border-bordercolor bg-slate-900/50 hover:border-slate-700 transition-all">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-bold text-sm">XRP/USDT</span>
-                            <span class="text-xs font-mono text-emerald-400">+4.5%</span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mono">AI: Breakout Imminent</p>
-                        <div class="mt-2 text-[10px] bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded inline-block">Score: 82/100</div>
-                    </div>
-                </div>
+    <!-- Chart + AI Analysis Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Chart -->
+      <div class="lg:col-span-2 glass rounded-xl overflow-hidden glow">
+        <div class="flex items-center justify-between px-3 py-2 border-b border-slate-800/80">
+          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            Live Chart
+          </h2>
+          <span class="text-[10px] text-slate-500">Powered by TradingView</span>
+        </div>
+        <div class="tradingview-widget-container tv-chart" id="tvChart">
+          <div id="tradingview_chart" class="h-full w-full"></div>
+        </div>
+      </div>
+
+      <!-- AI Agent Panel -->
+      <div class="glass rounded-xl flex flex-col overflow-hidden">
+        <div class="px-3 py-2 border-b border-slate-800/80 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+            <svg class="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            AI Agent
+          </h2>
+          <button id="btnAnalyze" class="text-xs bg-sky-600 hover:bg-sky-500 text-white px-3 py-1.5 rounded-lg font-medium transition active:scale-95">
+            Analyze Chart
+          </button>
+        </div>
+        <div id="aiOutput" class="flex-1 p-3 overflow-y-auto scrollbar-thin text-sm space-y-3 min-h-[280px]">
+          <div class="text-slate-500 text-center py-8 text-xs">
+            Select a pair and click <strong class="text-sky-400">Analyze Chart</strong>.<br>
+            The agent will scan structure, suggest entry / SL / TP and risk parameters.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trade Setup + Risk Calculator -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Trade Parameters -->
+      <div class="glass rounded-xl p-4 space-y-4">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          Trade Setup
+        </h2>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[11px] text-slate-500 block mb-1">Direction</label>
+            <div class="flex rounded-lg overflow-hidden border border-slate-700">
+              <button id="btnLong" class="flex-1 py-2 text-xs font-semibold bg-emerald-600/30 text-emerald-400 border-r border-slate-700">LONG</button>
+              <button id="btnShort" class="flex-1 py-2 text-xs font-semibold text-slate-400 hover:bg-slate-800">SHORT</button>
             </div>
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-500 block mb-1">Leverage</label>
+            <select id="leverage" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-2.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-500/40">
+              <option value="1">1x</option>
+              <option value="2">2x</option>
+              <option value="3">3x</option>
+              <option value="5" selected>5x</option>
+              <option value="10">10x</option>
+              <option value="20">20x</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2.5">
+          <div>
+            <label class="text-[11px] text-slate-500 block mb-1">Entry</label>
+            <input id="entryPrice" type="number" step="any" placeholder="0.00" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-2.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-500/40" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-500 block mb-1">Stop Loss</label>
+            <input id="stopLoss" type="number" step="any" placeholder="0.00" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-2.5 py-2 text-sm font-mono text-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500/40" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-500 block mb-1">Take Profit</label>
+            <input id="takeProfit" type="number" step="any" placeholder="0.00" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-2.5 py-2 text-sm font-mono text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40" />
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnApplyAI" class="flex-1 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium transition border border-slate-600">
+            Apply AI Levels
+          </button>
+          <button id="btnSimulate" class="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold transition shadow-lg shadow-sky-500/20 active:scale-[0.98]">
+            Simulate Trade
+          </button>
+        </div>
+      </div>
 
-            <!-- CHART & TECHNICAL ANALYSIS VIEW -->
-            <div class="bg-cardbg border border-bordercolor rounded-2xl p-4 shadow-xl">
-                <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
-                    <div class="flex items-center gap-3">
-                        <h3 id="activePairTitle" class="font-bold text-lg text-slate-100">BTC/USDT Futures</h3>
-                        <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">Perpetual</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs font-mono">
-                        <span class="text-slate-400">RSI (14): <strong id="valRSI" class="text-cyan-400">58.4</strong></span>
-                        <span class="text-slate-400">MACD: <strong id="valMACD" class="text-emerald-400">Bullish Cross</strong></span>
-                    </div>
-                </div>
+      <!-- Risk Management -->
+      <div class="glass rounded-xl p-4 space-y-4">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+          <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Risk Management
+        </h2>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[11px] text-slate-500 block mb-1">Account Balance ($)</label>
+            <input id="balanceInput" type="number" value="10000" step="100" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-2.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-500/40" />
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-500 block mb-1">Risk per Trade (%)</label>
+            <input id="riskPctInput" type="number" value="1" min="0.1" max="5" step="0.1" class="w-full bg-slate-900/80 border border-slate-700 rounded-lg px-2.5 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-sky-500/40" />
+          </div>
+        </div>
+        <div id="riskStats" class="grid grid-cols-2 gap-2 text-xs">
+          <div class="bg-slate-900/60 rounded-lg p-2.5">
+            <div class="text-slate-500">Risk Amount</div>
+            <div id="riskAmount" class="font-mono font-semibold text-amber-400 text-base">$100.00</div>
+          </div>
+          <div class="bg-slate-900/60 rounded-lg p-2.5">
+            <div class="text-slate-500">Position Size</div>
+            <div id="posSize" class="font-mono font-semibold text-sky-400 text-base">—</div>
+          </div>
+          <div class="bg-slate-900/60 rounded-lg p-2.5">
+            <div class="text-slate-500">Notional</div>
+            <div id="notional" class="font-mono font-semibold text-white text-base">—</div>
+          </div>
+          <div class="bg-slate-900/60 rounded-lg p-2.5">
+            <div class="text-slate-500">R : R</div>
+            <div id="rrRatio" class="font-mono font-semibold text-emerald-400 text-base">—</div>
+          </div>
+        </div>
+        <div class="text-[11px] text-slate-500 leading-relaxed">
+          Position size is calculated so that a stop-out loses only the risk % of your account. Leverage only affects margin required, not the planned risk.
+        </div>
+      </div>
+    </div>
 
-                <!-- Simulated Candlestick / Technical Canvas -->
-                <div class="relative w-full h-64 bg-slate-950 rounded-xl border border-bordercolor overflow-hidden flex items-center justify-center">
-                    <!-- SVG Candlestick Mockup -->
-                    <svg class="w-full h-full opacity-80" viewBox="0 0 600 200" preserveAspectRatio="none">
-                        <!-- Grid lines -->
-                        <line x1="0" y1="50" x2="600" y2="50" stroke="#1f2937" stroke-dasharray="4" />
-                        <line x1="0" y1="100" x2="600" y2="100" stroke="#1f2937" stroke-dasharray="4" />
-                        <line x1="0" y1="150" x2="600" y2="150" stroke="#1f2937" stroke-dasharray="4" />
-                        
-                        <!-- EMA Line -->
-                        <path d="M 0,120 Q 150,90 300,100 T 600,60" fill="none" stroke="#06b6d4" stroke-width="2" />
-                        <!-- Bollinger Band Upper -->
-                        <path d="M 0,90 Q 150,60 300,70 T 600,30" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="2" />
-                        <!-- Bollinger Band Lower -->
-                        <path d="M 0,150 Q 150,120 300,130 T 600,90" fill="none" stroke="#334155" stroke-width="1" stroke-dasharray="2" />
+    <!-- Research Tools -->
+    <div class="glass rounded-xl p-4">
+      <h2 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+        <svg class="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Research & On-Chain Tools
+      </h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <a href="https://www.coinglass.com/" target="_blank" rel="noopener" class="group flex flex-col items-center gap-1.5 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-sky-500/40 hover:bg-sky-500/5 transition">
+          <div class="w-9 h-9 rounded-lg bg-orange-500/20 flex items-center justify-center text-orange-400 text-sm font-bold">CG</div>
+          <span class="text-[11px] font-medium text-slate-300 group-hover:text-white">Coinglass</span>
+          <span class="text-[9px] text-slate-600">Funding · OI</span>
+        </a>
+        <a href="https://intel.arkm.com/" target="_blank" rel="noopener" class="group flex flex-col items-center gap-1.5 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-sky-500/40 hover:bg-sky-500/5 transition">
+          <div class="w-9 h-9 rounded-lg bg-violet-500/20 flex items-center justify-center text-violet-400 text-sm font-bold">AK</div>
+          <span class="text-[11px] font-medium text-slate-300 group-hover:text-white">Arkham</span>
+          <span class="text-[9px] text-slate-600">On-chain Intel</span>
+        </a>
+        <a href="https://app.bubblemaps.io/" target="_blank" rel="noopener" class="group flex flex-col items-center gap-1.5 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-sky-500/40 hover:bg-sky-500/5 transition">
+          <div class="w-9 h-9 rounded-lg bg-pink-500/20 flex items-center justify-center text-pink-400 text-sm font-bold">BM</div>
+          <span class="text-[11px] font-medium text-slate-300 group-hover:text-white">Bubblemaps</span>
+          <span class="text-[9px] text-slate-600">Holder Clusters</span>
+        </a>
+        <a href="https://www.binance.com/en/futures/BTCUSDT" target="_blank" rel="noopener" class="group flex flex-col items-center gap-1.5 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-sky-500/40 hover:bg-sky-500/5 transition">
+          <div class="w-9 h-9 rounded-lg bg-yellow-500/20 flex items-center justify-center text-yellow-400 text-sm font-bold">BN</div>
+          <span class="text-[11px] font-medium text-slate-300 group-hover:text-white">Binance</span>
+          <span class="text-[9px] text-slate-600">Futures</span>
+        </a>
+        <a href="https://www.bybit.com/trade/usdt/BTCUSDT" target="_blank" rel="noopener" class="group flex flex-col items-center gap-1.5 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-sky-500/40 hover:bg-sky-500/5 transition">
+          <div class="w-9 h-9 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 text-sm font-bold">BY</div>
+          <span class="text-[11px] font-medium text-slate-300 group-hover:text-white">Bybit</span>
+          <span class="text-[9px] text-slate-600">Futures</span>
+        </a>
+        <a href="https://www.tradingview.com/chart/?symbol=BINANCE:BTCUSDT" target="_blank" rel="noopener" class="group flex flex-col items-center gap-1.5 p-3 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-sky-500/40 hover:bg-sky-500/5 transition">
+          <div class="w-9 h-9 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400 text-sm font-bold">TV</div>
+          <span class="text-[11px] font-medium text-slate-300 group-hover:text-white">TradingView</span>
+          <span class="text-[9px] text-slate-600">Full Chart</span>
+        </a>
+      </div>
+    </div>
 
-                        <!-- Candlesticks -->
-                        <!-- Candle 1 -->
-                        <line x1="50" y1="100" x2="50" y2="140" stroke="#10b981" stroke-width="2" />
-                        <rect x="45" y="110" width="10" height="20" fill="#10b981" />
-                        <!-- Candle 2 -->
-                        <line x1="100" y1="90" x2="100" y2="130" stroke="#ef4444" stroke-width="2" />
-                        <rect x="95" y="100" width="10" height="15" fill="#ef4444" />
-                        <!-- Candle 3 -->
-                        <line x1="150" y1="80" x2="150" y2="120" stroke="#10b981" stroke-width="2" />
-                        <rect x="145" y="85" width="10" height="25" fill="#10b981" />
-                        <!-- Candle 4 -->
-                        <line x1="200" y1="75" x2="200" y2="115" stroke="#10b981" stroke-width="2" />
-                        <rect x="195" y="80" width="10" height="20" fill="#10b981" />
-                        <!-- Candle 5 -->
-                        <line x1="250" y1="60" x2="250" y2="100" stroke="#ef4444" stroke-width="2" />
-                        <rect x="245" y="70" width="10" height="15" fill="#ef4444" />
-                        <!-- Candle 6 -->
-                        <line x1="300" y1="50" x2="300" y2="90" stroke="#10b981" stroke-width="2" />
-                        <rect x="295" y="55" width="10" height="25" fill="#10b981" />
-                        <!-- Candle 7 -->
-                        <line x1="350" y1="40" x2="350" y2="80" stroke="#10b981" stroke-width="2" />
-                        <rect x="345" y="45" width="10" height="30" fill="#10b981" />
-                        <!-- Candle 8 (Current) -->
-                        <line x1="400" y1="30" x2="400" y2="70" stroke="#10b981" stroke-width="2" />
-                        <rect x="395" y="35" width="10" height="20" fill="#10b981" />
-                    </svg>
-
-                    <!-- Overlay AI Entry/TP/SL Markers -->
-                    <div class="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between">
-                        <div class="flex justify-between items-start">
-                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] px-2 py-0.5 rounded mono">TP: $68,450.00</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 text-[10px] px-2 py-0.5 rounded mono">ENTRY: $64,200.00
+    <!-- Automation & Log -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="glass rounded-xl p-4 space-y-3">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+          <svg class="w-4 h-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Automation Controls
+        </h2>
+        <div class="space-y-2.5">
+          <label class="flex items-center justify-between p-2.5 rounded-lg bg-slate-900/50 cursor-pointer">
+            <span class="text-xs text-slate-300">Auto-analyze on pair change</span>
+            <input type="checkbox" id="autoAnalyze" class="w-4 h-4 rounded accent-sky-500" />
+          </label>
+     
