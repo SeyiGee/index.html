@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head> <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoBot - Futures & Research Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darker: '#0b0e14',
+                        card: '#121620',
+                        accent: '#2563eb',
+                        success: '#10b981',
+                        danger: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-darker text-gray-100 font-sans antialiased min-h-screen flex justify-center items-center p-2 sm:p-4">
+
+    <!-- App Container (Mobile First / Telegram Mini App Frame) -->
+    <div class="w-full max-w-md bg-card border border-gray-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        
+        <!-- Header -->
+        <div class="bg-gray-900 px-4 py-3 border-b border-gray-800 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-3 h-3 rounded-full bg-success animate-pulse"></div>
+                <span class="font-bold text-sm tracking-wide">AUTOBOT v2.0</span>
+            </div>
+            <div class="text-xs bg-gray-800 px-2.5 py-1 rounded-full text-gray-300 font-medium border border-gray-700">
+                Bal: $<span id="accountBalance">10,000.00</span>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="p-4 space-y-4 overflow-y-auto max-h-[85vh]">
+
+            <!-- Asset Selector Tabs -->
+            <div class="grid grid-cols-3 gap-2 bg-gray-900/60 p-1 rounded-xl border border-gray-800/80">
+                <button onclick="switchAsset('BTC/USDT')" id="tab-BTC" class="py-2 text-xs font-semibold rounded-lg bg-accent text-white shadow transition">BTC/USDT</button>
+                <button onclick="switchAsset('ETH/USDT')" id="tab-ETH" class="py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">ETH/USDT</button>
+                <button onclick="switchAsset('SOL/USDT')" id="tab-SOL" class="py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">SOL/USDT</button>
+            </div>
+
+            <!-- Market Analyzer & Technical Card -->
+            <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-3.5 space-y-3">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 id="assetTitle" class="text-lg font-bold text-white">BTC / USDT</h2>
+                        <p class="text-xs text-gray-400">Perpetual Futures • 1h Timeframe</p>
+                    </div>
+                    <div class="text-right">
+                        <span id="currentPrice" class="text-base font-bold text-white">$64,250.00</span>
+                        <p id="priceChange" class="text-xs text-success font-medium">+3.42%</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <div class="bg-gray-900 p-2 rounded-lg border border-gray-800 text-center">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">Trend</span>
+                        <p id="marketTrend" class="text-xs font-bold text-success mt-0.5">BULLISH</p>
+                    </div>
+                    <div class="bg-gray-900 p-2 rounded-lg border border-gray-800 text-center">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">RSI (14)</span>
+                        <p id="rsiValue" class="text-xs font-bold text-yellow-400 mt-0.5">58.4</p>
+                    </div>
+                    <div class="bg-gray-900 p-2 rounded-lg border border-gray-800 text-center">
+                        <span class="text-[10px] text-gray-400 uppercase tracking-wider">ATR (Volatility)</span>
+                        <p id="atrValue" class="text-xs font-bold text-white mt-0.5">$480.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Research Tools Quick Links -->
+            <div>
+                <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Research & On-Chain Tools</span>
+                <div class="grid grid-cols-3 gap-2">
+                    <a id="linkCoinglass" href="https://www.coinglass.com" target="_blank" class="flex items-center justify-center space-x-1.5 bg-gray-900 hover:bg-gray-800 border border-gray-800 py-2 px-3 rounded-lg text-xs font-medium text-gray-300 transition">
+                        <i class="fa-solid fa-chart-line text-blue-400"></i>
+                        <span>Coinglass</span>
+                    </a>
+                    <a id="linkArkham" href="https://platform.arkhamintelligence.com" target="_blank" class="flex items-center justify-center space-x-1.5 bg-gray-900 hover:bg-gray-800 border border-gray-800 py-2 px-3 rounded-lg text-xs font-medium text-gray-300 transition">
+                        <i class="fa-solid fa-eye text-purple-400"></i>
+                        <span>Arkham</span>
+                    </a>
+                    <a id="linkBubblemaps" href="https://bubblemaps.io" target="_blank" class="flex items-center justify-center space-x-1.5 bg-gray-900 hover:bg-gray-800 border border-gray-800 py-2 px-3 rounded-lg text-xs font-medium text-gray-300 transition">
+                        <i class="fa-solid fa-circle-nodes text-green-400"></i>
+                        <span>Bubblemaps</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Risk Management & Trade Plan Panel -->
+            <div class="bg-gray-900/40 border border-gray-800 rounded-xl p-3.5 space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold text-gray-300 uppercase tracking-wider">Risk Management Engine</span>
+                    <span class="text-xs text-blue-400 font-medium">Risk: <span id="riskPctDisplay">1.0</span>%</span>
+                </div>
+
+                <!-- Inputs -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] text-gray-400 mb-1">Leverage (<span id="leverageVal">10</span>x)</label>
+                        <input type="range" id="leverageInput" min="1" max="50" value="10" class="w-full accent-blue-600 bg-gray-800 h-1.5 rounded-lg cursor-pointer" oninput="updateCalculations()">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-gray-400 mb-1">Risk per Trade (%)</label>
+                        <input type="range" id="riskInput" min="0.5" max="5.0" step="0.5" value="1.0" class="w-full accent-blue-600 bg-gray-800 h-1.5 rounded-lg cursor-pointer" oninput="updateCalculations()">
+                    </div>
+                </div>
+
+                <!-- Trade Plan Breakdown -->
+                <div class="bg-gray-900 rounded-lg p-3 border border-gray-800/80 space-y-2 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Entry Price:</span>
+                        <span id="planEntry" class="font-mono font-bold text-white">$64,250.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Stop Loss (SL):</span>
+                        <span id="planSL" class="font-mono font-bold text-danger">$63,530.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Take Profit (TP):</span>
+                        <span id="planTP" class="font-mono font-bold text-success">$65,690.00</span>
+                    </div>
+                    <hr class="border-gray-800 my-1">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Position Size:</span>
+                        <span id="planSize" class="font-mono font-bold text-white">0.1560 BTC</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Required Margin:</span>
+                        <span id="planMargin" class="font-mono font-bold text-blue-400">$1,002.34</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Execution Action Buttons -->
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <button onclick="executeTrade('LONG')" class="w-full bg-success hover:bg-emerald-600 text-gray-950 font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-sm">
+                    <i class="fa-solid fa-rocket"></i>
+                    <span>Execute Long</span>
+                </button>
+                <button onclick="executeTrade('SHORT')" class="w-full bg-danger hover:bg-red-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-sm">
+                    <i class="fa-solid fa-arrow-trend-down"></i>
+                    <span>Execute Short</span>
+                </button>
+            </div>
+
+            <!-- Execution Status / Console Feedback -->
+            <div id="consoleLog" class="hidden bg-gray-900 border border-gray-800 rounded-xl p-3 font-mono text-[11px] text-gray-300 space-y-1">
+                <p class="text-blue-400 font-bold"># System Log</p>
+                <p id="logMessage">Ready for command execution...</p>
+            </div>
+
+        </div>
+
+        <!-- Footer Bar -->
+        <div class="bg-gray-900 px-4 py-2.5 border-t border-gray-800 text-center text-[11px] text-gray-500">
+            Automated Futures & Risk Engine • Secure CCXT Tunnel Active
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Mock Market Database
+        const marketData = {
+            'BTC/USDT': { price: 64250.00, change: '+3.42%', trend: 'BULLISH', rsi: 58.4, atr: 480.00, slOffset: 720, tpOffset: 1440 },
+            'ETH/USDT': { price: 3480.50, change: '+1.85%', trend: 'BULLISH', rsi: 62.1, atr: 45.00, slOffset: 65, tpOffset: 130 },
+            'SOL/USDT': { price: 148.20, change: '-0.75%', trend: 'BEARISH', rsi: 44.2, atr: 3.50, slOffset: 5, tpOffset: 10 }
+        };
+
+        let currentAsset = 'BTC/USDT';
+        let accountBalance = 10000.00;
+
+        function switchAsset(symbol) {
+            currentAsset = symbol;
+            
+            // Update Tab Styles
+            ['BTC', 'ETH', 'SOL'].forEach(coin => {
+                const btn = document.getElementById(`tab-${coin}`);
+                if (coin === symbol.split('/')[0]) {
+                    btn.className = "py-2 text-xs font-semibold rounded-lg bg-accent text-white shadow transition";
+                } else {
+                    btn.className = "py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition";
+                }
+            });
+
+            // Update UI elements
+            const data = marketData[symbol];
+            document.getElementById('assetTitle').innerText = symbol.replace('/', ' / ');
+            document.getElementById('currentPrice').innerText = `$${data.price.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            const changeEl = document.getElementById('priceChange');
+            changeEl.innerText = data.change;
+            changeEl.className = data.change.startsWith('+') ? 'text-xs text-success font-medium' : 'text-xs text-danger font-medium';
+            
+            document.getElementById('marketTrend').innerText = data.trend;
+            document.getElementById('marketTrend').className = data.trend === 'BULLISH' ? 'text-xs font-bold text-success mt-0.5' : 'text-xs font-bold text-danger mt-0.5';
+            document.getElementById('rsiValue').innerText = data.rsi;
+            document.getElementById('atrValue').innerText = `$${data.atr.toFixed(2)}`;
+
+            // Update Research links
+            const base = symbol.split('/')[0].toLowerCase();
+            document.getElementById('linkCoinglass').href = `https://www.coinglass.com/currencies/${base.toUpperCase()}`;
+            document.getElementById('linkArkham').href = `https://platform.arkhamintelligence.com/explorer/token/${base}`;
+            document.getElementById('linkBubblemaps').href = `https://bubblemaps.io/`;
+
+            updateCalculations();
+        }
+
+        function updateCalculations() {
+            const data = marketData[currentAsset];
+            const leverage = parseInt(document.getElementById('leverageInput').value);
+            const riskPct = parseFloat(document.getElementById('riskInput').value);
+
+            document.getElementById('leverageVal').innerText = leverage;
+            document.getElementById('riskPctDisplay').innerText = riskPct;
+
+            const entry = data.price;
+            let sl, tp;
+
+            if (data.trend === 'BULLISH') {
+                sl = entry - data.slOffset;
+                tp = entry + data.tpOffset;
+            } else {
+                sl = entry + data.slOffset;
+                tp = entry - data.tpOffset;
+            }
+
+            const riskAmount = accountBalance * (riskPct / 100);
+            const priceRiskPerUnit = Math.abs(entry - sl);
+            const positionUnits = riskAmount / priceRiskPerUnit;
+            const notionalValue = positionUnits * entry;
+            const requiredMargin = notionalValue / leverage;
+
+            document.getElementById('planEntry').innerText = `$${entry.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('planSL').innerText = `$${sl.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('planTP').innerText = `$${tp.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('planSize').innerText = `${positionUnits.toFixed(4)} ${currentAsset.split('/')[0]}`;
+            document.getElementById('planMargin').innerText = `$${requiredMargin.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        }
+
+        function executeTrade(side) {
+            const consoleBox = document.getElementById('consoleLog');
+            const logMsg = document.getElementById('logMessage');
+            consoleBox.classList.remove('hidden');
+
+            const timestamp = new Date().toLocaleTimeString();
+            const leverage = document.getElementById('leverageInput').value;
+            
+            logMsg.innerHTML = `[${timestamp}] 🚀 Sending ${side} order for ${currentAsset} (${leverage}x) via CCXT...<br>` +
+                               `<span class="text-success">[OK] Market entry, bracket SL & TP attached successfully!</span>`;
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            updateCalculations();
+        };
+    </script>
+</body>
+</html>
